@@ -60,9 +60,9 @@
     // sanity check on the stream pointer
     if (m_stream != nullptr)
     {
-        CMFormatDescriptionRef desc = CMSampleBufferGetFormatDescription(sampleBuffer);
-        FourCharCode fourcc = CMFormatDescriptionGetMediaSubType(desc);
-        CMVideoDimensions dims = CMVideoFormatDescriptionGetDimensions(desc);
+//        CMFormatDescriptionRef desc = CMSampleBufferGetFormatDescription(sampleBuffer);
+//        FourCharCode fourcc = CMFormatDescriptionGetMediaSubType(desc);
+//        CMVideoDimensions dims = CMVideoFormatDescriptionGetDimensions(desc);
 
         #if 0
         // generate 4cc string

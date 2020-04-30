@@ -327,6 +327,6 @@ int main(int argc, char*argv[])
 
     CapResult result = Cap_releaseContext(ctx);
 
-    return 0;
+    return result;
 }
 

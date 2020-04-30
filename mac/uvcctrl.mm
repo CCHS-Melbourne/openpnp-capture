@@ -371,9 +371,9 @@ bool UVCCtrl::sendControlRequest(IOUSBDevRequest req)
         #define err_get_sub(err) (((err)>>14)&0xfff) 
         #define err_get_code(err) ((err)&0x3fff)
         
-        uint32_t code = err_get_code(kr);
-        uint32_t sys  = err_get_system(kr);
-        uint32_t sub  = err_get_sub(kr);
+//        uint32_t code = err_get_code(kr);
+//        uint32_t sys  = err_get_system(kr);
+//        uint32_t sub  = err_get_sub(kr);
 
         switch(kr)
         {

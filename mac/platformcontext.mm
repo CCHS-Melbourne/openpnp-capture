@@ -42,23 +42,27 @@ PlatformContext::PlatformContext() :
     Context()
 {
     LOG(LOG_INFO, "Platform context created\n");
+#if defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     /**
      If we are not yet authorized to use the camera, request auth. If we're already authed we can go
      ahead and enumerate.
      */
-    if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusAuthorized) {
-        enumerateDevices();
+    if (@available(macOS 10.15, *)) {
+        if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusAuthorized) {
+            enumerateDevices();
+        }
+        else {
+            NSLog(@"Bundle path for Info.plist: %@", [[NSBundle mainBundle] bundlePath]);
+            [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+                /**
+                TODO Would like to call enumerateDevices(); here so that once the user has authorized they
+                can list the cameras, but this crashes. Probbaly we need to do it on the same thread
+                as this was originally called from.
+                */
+            } ];
+        }
     }
-    else {
-        NSLog(@"Bundle path for Info.plist: %@", [[NSBundle mainBundle] bundlePath]);
-        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-            /**
-             TODO Would like to call enumerateDevices(); here so that once the user has authorized they
-             can list the cameras, but this crashes. Probbaly we need to do it on the same thread
-             as this was originally called from.
-             */
-        } ];
-    }
+#endif
 }
 
 PlatformContext::~PlatformContext()
@@ -71,7 +75,13 @@ bool PlatformContext::enumerateDevices()
     LOG(LOG_DEBUG, "enumerateDevices called\n");
 
     m_devices.clear();
-    for (AVCaptureDevice* device in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) 
+    
+    AVCaptureDeviceDiscoverySession *captureDeviceDiscoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeExternalUnknown]
+                                          mediaType:AVMediaTypeVideo
+                                           position:AVCaptureDevicePositionUnspecified];
+    NSArray *captureDevices = [captureDeviceDiscoverySession devices];
+
+    for (AVCaptureDevice* device in captureDevices)
     {
         platformDeviceInfo* deviceInfo = new platformDeviceInfo();
         deviceInfo->m_captureDevice = CFBridgingRetain(device);
